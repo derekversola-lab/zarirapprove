@@ -116,6 +116,11 @@
           "pattern": "Request({key}):?query:",
           "name": "RequestObjectPage",
           "target": "RequestObjectPage"
+        },
+        {
+          "pattern": "Request({key})/_Item({key2}):?query:",
+          "name": "RequestItemObjectPage",
+          "target": "RequestItemObjectPage"
         }
       ],
       "targets": {
@@ -173,7 +178,25 @@
                     }
                   }
                 }
+              },
+              "navigation": {
+                "_Item": {
+                  "detail": {
+                    "route": "RequestItemObjectPage"
+                  }
+                }
               }
+            }
+          }
+        },
+        "RequestItemObjectPage": {
+          "type": "Component",
+          "id": "RequestItemObjectPage",
+          "name": "sap.fe.templates.ObjectPage",
+          "options": {
+            "settings": {
+              "editableHeaderContent": false,
+              "contextPath": "/Request/_Item"
             }
           }
         }
