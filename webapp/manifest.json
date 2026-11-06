@@ -9,28 +9,16 @@
     },
     "title": "{{appTitle}}",
     "description": "{{appDescription}}",
-    "resources": "resources.json",
     "sourceTemplate": {
       "id": "@sap/generator-fiori:lrop",
       "version": "1.34.0",
       "toolsId": "9cdc65a7-d8b5-4514-9e97-7eb08d2432e6"
     },
     "dataSources": {
-      "annotation": {
-        "type": "ODataAnnotation",
-        "uri": "annotations/annotation.xml",
-        "settings": {
-          "localUri": "annotations/annotation.xml"
-        }
-      },
       "mainService": {
         "uri": "/sap/opu/odata4/sap/zui_arir_approve_o4/srvd/sap/zui_arir_approve/0001/",
         "type": "OData",
         "settings": {
-          "annotations": [
-            "annotation"
-          ],
-          "localUri": "localService/mainService/metadata.xml",
           "odataVersion": "4.0"
         }
       }
