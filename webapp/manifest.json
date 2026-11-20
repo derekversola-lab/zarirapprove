@@ -140,6 +140,13 @@
                       "visible": true,
                       "enabled": true,
                       "requiresSelection": false
+                    },
+                    "PreviewPrint": {
+                      "press": "zarirapprove.ext.controller.PreviewPrint.onPreviewPrint",
+                      "text": "{i18n>previewPrint}",
+                      "visible": true,
+                      "enabled": "zarirapprove.ext.controller.PreviewPrint.isSingleSelected",
+                      "requiresSelection": true
                     }
                   }
                 }
@@ -163,6 +170,12 @@
                       "text": "Refresh",
                       "visible": "{= !${ui>/isEditable} }",
                       "enabled": true
+                    },
+                    "PreviewPrint": {
+                      "press": "zarirapprove.ext.controller.PreviewPrint.onPreviewPrint",
+                      "text": "{i18n>previewPrint}",
+                      "visible": true,
+                      "enabled": "{= ${StatusText} !== 'Posted' }"
                     }
                   }
                 }
