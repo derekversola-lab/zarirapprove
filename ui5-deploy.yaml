@@ -20,7 +20,7 @@ builder:
           name: ZARIR_APR_UI
           description: AR Invoice Request Approval
           package: ZARIR
-          transport: IL6K900437
+          transport: IL6K900687
         exclude:
           - /test/
           - /localService/

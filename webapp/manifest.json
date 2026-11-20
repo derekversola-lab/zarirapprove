@@ -189,6 +189,15 @@
           }
         }
       }
+    },
+    "extends": {
+      "extensions": {
+        "sap.ui.controllerExtensions": {
+          "sap.fe.templates.ObjectPage.ObjectPageController#zarirapprove::RequestObjectPage": {
+            "controllerName": "zarirapprove.ext.controller.ObjectPageExt"
+          }
+        }
+      }
     }
   },
   "sap.fiori": {
