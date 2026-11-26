@@ -42,7 +42,9 @@ sap.ui.define([
 				return;
 			}
 			oContext.requestProperty(["Status", "StatusText"]).then(function (aValues) {
-				var bEnabled = aValues[0] !== "P" && aValues[1] !== "Posted";
+				// Posted, reversal requested or reversed: no preview
+				var bEnabled = ["P", "Q", "V"].indexOf(aValues[0]) < 0 &&
+					["Posted", "Reversal Requested", "Reversed"].indexOf(aValues[1]) < 0;
 				Element.registry.filter(function (oControl) {
 					return !!oControl.setEnabled && /CustomAction::PreviewPrint$/.test(oControl.getId());
 				}).forEach(function (oButton) {

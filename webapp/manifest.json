@@ -175,7 +175,7 @@
                       "press": "zarirapprove.ext.controller.PreviewPrint.onPreviewPrint",
                       "text": "{i18n>previewPrint}",
                       "visible": true,
-                      "enabled": "{= ${StatusText} !== 'Posted' }"
+                      "enabled": "{= ${StatusText} !== 'Posted' && ${StatusText} !== 'Reversal Requested' && ${StatusText} !== 'Reversed' }"
                     }
                   }
                 }

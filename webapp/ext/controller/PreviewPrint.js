@@ -26,10 +26,14 @@ sap.ui.define([
 		}
 	}
 
-	// Posted? The screens show StatusText, so only StatusText is loaded for sure
-	// (Status itself is not on the screen); "Posted" is fixed in the CDS view.
+	// Posted (also: reversal requested, reversed)? The screens show StatusText,
+	// so only StatusText is loaded for sure (Status itself is not on the
+	// screen); the texts are fixed in the CDS view.
+	var POSTED_STATUS = ["P", "Q", "V"];
+	var POSTED_TEXT = ["Posted", "Reversal Requested", "Reversed"];
 	function isPosted(oContext) {
-		return oContext.getProperty("Status") === "P" || oContext.getProperty("StatusText") === "Posted";
+		return POSTED_STATUS.indexOf(oContext.getProperty("Status")) >= 0 ||
+			POSTED_TEXT.indexOf(oContext.getProperty("StatusText")) >= 0;
 	}
 
 	function previewUrl(oContext) {
