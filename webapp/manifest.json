@@ -1,225 +1,236 @@
 {
-  "_version": "1.86.0",
-  "sap.app": {
-    "id": "zarirapprove",
-    "type": "application",
-    "i18n": "i18n/i18n.properties",
-    "applicationVersion": {
-      "version": "0.0.1"
-    },
-    "title": "{{appTitle}}",
-    "description": "{{appDescription}}",
-    "sourceTemplate": {
-      "id": "@sap/generator-fiori:lrop",
-      "version": "1.34.0",
-      "toolsId": "9cdc65a7-d8b5-4514-9e97-7eb08d2432e6"
-    },
-    "dataSources": {
-      "mainService": {
-        "uri": "/sap/opu/odata4/sap/zui_arir_approve_o4/srvd/sap/zui_arir_approve/0001/",
-        "type": "OData",
-        "settings": {
-          "odataVersion": "4.0"
-        }
-      }
-    },
-    "crossNavigation": {
-      "inbounds": {
-        "ARInvoiceRequest-approve": {
-          "semanticObject": "ARInvoiceRequest",
-          "action": "approve",
-          "title": "Approve AR Invoice Requests",
-          "subTitle": "Direct AR invoicing",
-          "signature": {
-            "parameters": {},
-            "additionalParameters": "allowed"
-          }
-        }
-      }
-    }
-  },
-  "sap.ui": {
-    "technology": "UI5",
-    "icons": {
-      "icon": "",
-      "favIcon": "",
-      "phone": "",
-      "phone@2": "",
-      "tablet": "",
-      "tablet@2": ""
-    },
-    "deviceTypes": {
-      "desktop": true,
-      "tablet": true,
-      "phone": true
-    }
-  },
-  "sap.ui5": {
-    "flexEnabled": true,
-    "dependencies": {
-      "minUI5Version": "1.148.10",
-      "libs": {
-        "sap.m": {},
-        "sap.ui.core": {},
-        "sap.fe.templates": {}
-      }
-    },
-    "contentDensities": {
-      "compact": true,
-      "cozy": true
-    },
-    "models": {
-      "i18n": {
-        "type": "sap.ui.model.resource.ResourceModel",
-        "settings": {
-          "bundleName": "zarirapprove.i18n.i18n"
-        }
-      },
-      "": {
-        "dataSource": "mainService",
-        "preload": true,
-        "settings": {
-          "operationMode": "Server",
-          "autoExpandSelect": true,
-          "earlyRequests": true
-        }
-      },
-      "@i18n": {
-        "type": "sap.ui.model.resource.ResourceModel",
-        "uri": "i18n/i18n.properties"
-      }
-    },
-    "resources": {
-      "css": []
-    },
-    "routing": {
-      "config": {},
-      "routes": [
-        {
-          "pattern": ":?query:",
-          "name": "RequestList",
-          "target": "RequestList"
-        },
-        {
-          "pattern": "Request({key}):?query:",
-          "name": "RequestObjectPage",
-          "target": "RequestObjectPage"
-        },
-        {
-          "pattern": "Request({key})/_Item({key2}):?query:",
-          "name": "RequestItemObjectPage",
-          "target": "RequestItemObjectPage"
-        }
-      ],
-      "targets": {
-        "RequestList": {
-          "type": "Component",
-          "id": "RequestList",
-          "name": "sap.fe.templates.ListReport",
-          "options": {
-            "settings": {
-              "contextPath": "/Request",
-              "variantManagement": "Page",
-              "initialLoad": "Enabled",
-              "navigation": {
-                "Request": {
-                  "detail": {
-                    "route": "RequestObjectPage"
-                  }
-                }
-              },
-              "controlConfiguration": {
-                "@com.sap.vocabularies.UI.v1.LineItem": {
-                  "tableSettings": {
-                    "type": "ResponsiveTable"
-                  },
-                  "actions": {
-                    "Refresh": {
-                      "press": "zarirapprove.ext.controller.Refresh.onRefresh",
-                      "text": "Refresh",
-                      "visible": true,
-                      "enabled": true,
-                      "requiresSelection": false
-                    },
-                    "PreviewPrint": {
-                      "press": "zarirapprove.ext.controller.PreviewPrint.onPreviewPrint",
-                      "text": "{i18n>previewPrint}",
-                      "visible": true,
-                      "enabled": "zarirapprove.ext.controller.PreviewPrint.isSingleSelected",
-                      "requiresSelection": true
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "RequestObjectPage": {
-          "type": "Component",
-          "id": "RequestObjectPage",
-          "name": "sap.fe.templates.ObjectPage",
-          "options": {
-            "settings": {
-              "editableHeaderContent": false,
-              "contextPath": "/Request",
-              "content": {
-                "header": {
-                  "actions": {
-                    "Refresh": {
-                      "press": "zarirapprove.ext.controller.Refresh.onRefresh",
-                      "text": "Refresh",
-                      "visible": "{= !${ui>/isEditable} }",
-                      "enabled": true
-                    },
-                    "PreviewPrint": {
-                      "press": "zarirapprove.ext.controller.PreviewPrint.onPreviewPrint",
-                      "text": "{i18n>previewPrint}",
-                      "visible": true,
-                      "enabled": "{= ${StatusText} !== 'Posted' && ${StatusText} !== 'Reversal Requested' && ${StatusText} !== 'Reversed' }"
-                    }
-                  }
-                }
-              },
-              "navigation": {
-                "_Item": {
-                  "detail": {
-                    "route": "RequestItemObjectPage"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "RequestItemObjectPage": {
-          "type": "Component",
-          "id": "RequestItemObjectPage",
-          "name": "sap.fe.templates.ObjectPage",
-          "options": {
-            "settings": {
-              "editableHeaderContent": false,
-              "contextPath": "/Request/_Item"
-            }
-          }
-        }
-      }
-    },
-    "extends": {
-      "extensions": {
-        "sap.ui.controllerExtensions": {
-          "sap.fe.templates.ObjectPage.ObjectPageController#zarirapprove::RequestObjectPage": {
-            "controllerName": "zarirapprove.ext.controller.ObjectPageExt"
-          }
-        }
-      }
-    }
-  },
-  "sap.fiori": {
-    "registrationIds": [],
-    "archeType": "transactional"
-  },
-  "sap.fe": {
-    "app": {
-      "enableLazyLoading": true
-    }
-  }
+	"_version": "1.86.0",
+	"sap.app": {
+		"id": "zarirapprove",
+		"type": "application",
+		"i18n": "i18n/i18n.properties",
+		"applicationVersion": {
+			"version": "0.0.1"
+		},
+		"title": "{{appTitle}}",
+		"description": "{{appDescription}}",
+		"sourceTemplate": {
+			"id": "@sap/generator-fiori:lrop",
+			"version": "1.34.0",
+			"toolsId": "9cdc65a7-d8b5-4514-9e97-7eb08d2432e6"
+		},
+		"dataSources": {
+			"mainService": {
+				"uri": "/sap/opu/odata4/sap/zui_arir_approve_o4/srvd/sap/zui_arir_approve/0001/",
+				"type": "OData",
+				"settings": {
+					"odataVersion": "4.0",
+					"annotations": [
+						"annotation"
+					]
+				}
+			},
+			"annotation": {
+				"type": "ODataAnnotation",
+				"uri": "annotations/annotation.xml",
+				"settings": {
+					"localUri": "annotations/annotation.xml"
+				}
+			}
+		},
+		"crossNavigation": {
+			"inbounds": {
+				"ARInvoiceRequest-approve": {
+					"semanticObject": "ARInvoiceRequest",
+					"action": "approve",
+					"title": "Approve AR Invoice Requests",
+					"subTitle": "Direct AR invoicing",
+					"signature": {
+						"parameters": {},
+						"additionalParameters": "allowed"
+					}
+				}
+			}
+		}
+	},
+	"sap.ui": {
+		"technology": "UI5",
+		"icons": {
+			"icon": "",
+			"favIcon": "",
+			"phone": "",
+			"phone@2": "",
+			"tablet": "",
+			"tablet@2": ""
+		},
+		"deviceTypes": {
+			"desktop": true,
+			"tablet": true,
+			"phone": true
+		}
+	},
+	"sap.ui5": {
+		"flexEnabled": true,
+		"dependencies": {
+			"minUI5Version": "1.148.10",
+			"libs": {
+				"sap.m": {},
+				"sap.ui.core": {},
+				"sap.fe.templates": {}
+			}
+		},
+		"contentDensities": {
+			"compact": true,
+			"cozy": true
+		},
+		"models": {
+			"i18n": {
+				"type": "sap.ui.model.resource.ResourceModel",
+				"settings": {
+					"bundleName": "zarirapprove.i18n.i18n"
+				}
+			},
+			"": {
+				"dataSource": "mainService",
+				"preload": true,
+				"settings": {
+					"operationMode": "Server",
+					"autoExpandSelect": true,
+					"earlyRequests": true
+				}
+			},
+			"@i18n": {
+				"type": "sap.ui.model.resource.ResourceModel",
+				"uri": "i18n/i18n.properties"
+			}
+		},
+		"resources": {
+			"css": []
+		},
+		"routing": {
+			"config": {},
+			"routes": [
+				{
+					"pattern": ":?query:",
+					"name": "RequestList",
+					"target": "RequestList"
+				},
+				{
+					"pattern": "Request({key}):?query:",
+					"name": "RequestObjectPage",
+					"target": "RequestObjectPage"
+				},
+				{
+					"pattern": "Request({key})/_Item({key2}):?query:",
+					"name": "RequestItemObjectPage",
+					"target": "RequestItemObjectPage"
+				}
+			],
+			"targets": {
+				"RequestList": {
+					"type": "Component",
+					"id": "RequestList",
+					"name": "sap.fe.templates.ListReport",
+					"options": {
+						"settings": {
+							"contextPath": "/Request",
+							"defaultTemplateAnnotationPath": "com.sap.vocabularies.UI.v1.SelectionPresentationVariant#Open",
+							"variantManagement": "Page",
+							"initialLoad": "Enabled",
+							"navigation": {
+								"Request": {
+									"detail": {
+										"route": "RequestObjectPage"
+									}
+								}
+							},
+							"controlConfiguration": {
+								"@com.sap.vocabularies.UI.v1.LineItem": {
+									"tableSettings": {
+										"type": "ResponsiveTable"
+									},
+									"actions": {
+										"Refresh": {
+											"press": "zarirapprove.ext.controller.Refresh.onRefresh",
+											"text": "Refresh",
+											"visible": true,
+											"enabled": true,
+											"requiresSelection": false
+										},
+										"PreviewPrint": {
+											"press": "zarirapprove.ext.controller.PreviewPrint.onPreviewPrint",
+											"text": "{i18n>previewPrint}",
+											"visible": true,
+											"enabled": "zarirapprove.ext.controller.PreviewPrint.isSingleSelected",
+											"requiresSelection": true
+										}
+									}
+								}
+							}
+						}
+					}
+				},
+				"RequestObjectPage": {
+					"type": "Component",
+					"id": "RequestObjectPage",
+					"name": "sap.fe.templates.ObjectPage",
+					"options": {
+						"settings": {
+							"editableHeaderContent": false,
+							"contextPath": "/Request",
+							"content": {
+								"header": {
+									"actions": {
+										"Refresh": {
+											"press": "zarirapprove.ext.controller.Refresh.onRefresh",
+											"text": "Refresh",
+											"visible": "{= !${ui>/isEditable} }",
+											"enabled": true
+										},
+										"PreviewPrint": {
+											"press": "zarirapprove.ext.controller.PreviewPrint.onPreviewPrint",
+											"text": "{i18n>previewPrint}",
+											"visible": true,
+											"enabled": "{= ${StatusText} !== 'Posted' && ${StatusText} !== 'Reversal Requested' && ${StatusText} !== 'Reversed' }"
+										}
+									}
+								}
+							},
+							"navigation": {
+								"_Item": {
+									"detail": {
+										"route": "RequestItemObjectPage"
+									}
+								}
+							}
+						}
+					}
+				},
+				"RequestItemObjectPage": {
+					"type": "Component",
+					"id": "RequestItemObjectPage",
+					"name": "sap.fe.templates.ObjectPage",
+					"options": {
+						"settings": {
+							"editableHeaderContent": false,
+							"contextPath": "/Request/_Item"
+						}
+					}
+				}
+			}
+		},
+		"extends": {
+			"extensions": {
+				"sap.ui.controllerExtensions": {
+					"sap.fe.templates.ObjectPage.ObjectPageController#zarirapprove::RequestObjectPage": {
+						"controllerName": "zarirapprove.ext.controller.ObjectPageExt"
+					}
+				}
+			}
+		}
+	},
+	"sap.fiori": {
+		"registrationIds": [],
+		"archeType": "transactional"
+	},
+	"sap.fe": {
+		"app": {
+			"enableLazyLoading": true
+		}
+	}
 }
