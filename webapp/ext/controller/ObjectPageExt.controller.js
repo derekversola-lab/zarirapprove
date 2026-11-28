@@ -118,6 +118,16 @@ sap.ui.define([
 						var oCtx = this.getBindingContext();
 						return fnSetEnabled.call(this, !!bEnabled && !isPostedContext(oCtx));
 					};
+					// ...also when "enabled" is set through setProperty directly
+					var fnSetProperty = oButton.setProperty;
+					oButton.setProperty = function (sName, vValue) {
+						if (sName === "enabled") {
+							var oCtx = this.getBindingContext();
+							arguments[1] = !!vValue && !isPostedContext(oCtx);
+						}
+						return fnSetProperty.apply(this, arguments);
+					};
+					oButton.setEnabled(true);
 					if (oButton.isBound("enabled")) {
 						oButton.unbindProperty("enabled", true);
 					}
