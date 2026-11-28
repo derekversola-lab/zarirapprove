@@ -39,15 +39,28 @@ sap.ui.define([
 	// company code or posting date change). Bound to the subsection, so it
 	// appears and disappears straight away; a section left without visible
 	// subsections is hidden by the page itself.
-	var WHT_SUBSECTION = /FacetSubSection::WithholdingTax$/;
+	var WHT_ID = /WithholdingTax/;
+	var WHT_TITLE = "Withholding Tax";
+
+	// The Withholding Tax subsection: found by its ID (facet WithholdingTax) or,
+	// if Fiori elements named it differently, by its title
+	function isWithholdingTaxSubSection(oControl) {
+		if (!oControl.isA || !oControl.isA("sap.uxap.ObjectPageSubSection")) {
+			return false;
+		}
+		return WHT_ID.test(oControl.getId()) ||
+			(oControl.getTitle && oControl.getTitle() === WHT_TITLE);
+	}
 
 	function applyWithholdingTaxVisibility() {
 		try {
-			Element.registry.filter(function (oControl) {
-				return !!oControl.bindProperty && WHT_SUBSECTION.test(oControl.getId());
-			}).forEach(function (oSubSection) {
+			Element.registry.filter(isWithholdingTaxSubSection).forEach(function (oSubSection) {
+				// Fiori elements may set its own "visible" binding: replace it once
 				if (!oSubSection._zarirWhtBound) {
 					oSubSection._zarirWhtBound = true;
+					if (oSubSection.isBound("visible")) {
+						oSubSection.unbindProperty("visible", true);
+					}
 					oSubSection.bindProperty("visible", {
 						path: "ShowWithholdingTax",
 						formatter: function (bShow) { return bShow === true; }
