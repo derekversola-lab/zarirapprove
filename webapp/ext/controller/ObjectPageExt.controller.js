@@ -39,29 +39,37 @@ sap.ui.define([
 	// company code or posting date change). Bound to the subsection, so it
 	// appears and disappears straight away; a section left without visible
 	// subsections is hidden by the page itself.
-	var WHT_ID = /WithholdingTax/;
+	// Withholding Tax: the Tax section is one subsection, so the withholding tax
+	// part is hidden piece by piece: its table (navigation _Wht) and its heading
+	// "Withholding Tax". In the approver app it is a subsection of its own.
+	var WHT_TABLE_ID = /::_Wht::LineItem$/;
+	var WHT_SUBSECTION_ID = /FacetSubSection::WithholdingTax$/;
 	var WHT_TITLE = "Withholding Tax";
 
-	// The Withholding Tax subsection: found by its ID (facet WithholdingTax) or,
-	// if Fiori elements named it differently, by its title
-	function isWithholdingTaxSubSection(oControl) {
-		if (!oControl.isA || !oControl.isA("sap.uxap.ObjectPageSubSection")) {
+	function isWithholdingTaxPart(oControl) {
+		if (!oControl.bindProperty || !oControl.getId) {
 			return false;
 		}
-		return WHT_ID.test(oControl.getId()) ||
-			(oControl.getTitle && oControl.getTitle() === WHT_TITLE);
+		var sId = oControl.getId();
+		if (WHT_TABLE_ID.test(sId) || WHT_SUBSECTION_ID.test(sId)) {
+			return true;
+		}
+		// the heading above the table (a title, not the table's own "Withholding Taxes")
+		return !!oControl.isA && oControl.isA("sap.m.Title") &&
+			oControl.getText && oControl.getText() === WHT_TITLE &&
+			sId.indexOf("::_Wht::") < 0;
 	}
 
 	function applyWithholdingTaxVisibility() {
 		try {
-			Element.registry.filter(isWithholdingTaxSubSection).forEach(function (oSubSection) {
+			Element.registry.filter(isWithholdingTaxPart).forEach(function (oControl) {
 				// Fiori elements may set its own "visible" binding: replace it once
-				if (!oSubSection._zarirWhtBound) {
-					oSubSection._zarirWhtBound = true;
-					if (oSubSection.isBound("visible")) {
-						oSubSection.unbindProperty("visible", true);
+				if (!oControl._zarirWhtBound) {
+					oControl._zarirWhtBound = true;
+					if (oControl.isBound("visible")) {
+						oControl.unbindProperty("visible", true);
 					}
-					oSubSection.bindProperty("visible", {
+					oControl.bindProperty("visible", {
 						path: "ShowWithholdingTax",
 						formatter: function (bShow) { return bShow === true; }
 					});
