@@ -87,17 +87,28 @@ sap.ui.define([
 			if (!oContext || !oContext.requestProperty) {
 				return;
 			}
-			oContext.requestProperty(["Status", "StatusText"]).then(function (aValues) {
-				// Posted, reversal requested or reversed: no preview
-				var bEnabled = ["P", "Q", "V"].indexOf(aValues[0]) < 0 &&
-					["Posted", "Reversal Requested", "Reversed"].indexOf(aValues[1]) < 0;
+			// Load Status (not on the screen), then bind the button to the status, so
+			// it also switches off when the request becomes Posted while the page is
+			// open (background posting, then Refresh)
+			oContext.requestProperty(["Status", "StatusText"]).then(function () {
 				Element.registry.filter(function (oControl) {
 					return !!oControl.setEnabled && /CustomAction::PreviewPrint$/.test(oControl.getId());
 				}).forEach(function (oButton) {
+					if (oButton._zarirPreviewBound) {
+						return;
+					}
 					if (oButton.isBound("enabled")) {
 						oButton.unbindProperty("enabled", true);
 					}
-					oButton.setEnabled(bEnabled);
+					oButton._zarirPreviewBound = true;
+					oButton.bindProperty("enabled", {
+						parts: [{ path: "Status" }, { path: "StatusText" }],
+						formatter: function (sStatus, sStatusText) {
+							// Posted, reversal requested or reversed: no preview
+							return ["P", "Q", "V"].indexOf(sStatus) < 0 &&
+								["Posted", "Reversal Requested", "Reversed"].indexOf(sStatusText) < 0;
+						}
+					});
 				});
 			}).catch(function () { /* keep the button as it is */ });
 		} catch (e) {
