@@ -34,6 +34,31 @@ sap.ui.define([
 		}
 	}
 
+	// Withholding Tax table: shown only when the customer has withholding tax
+	// (field ShowWithholdingTax, kept up to date by the backend when customer,
+	// company code or posting date change). Bound to the subsection, so it
+	// appears and disappears straight away; a section left without visible
+	// subsections is hidden by the page itself.
+	var WHT_SUBSECTION = /FacetSubSection::WithholdingTax$/;
+
+	function applyWithholdingTaxVisibility() {
+		try {
+			Element.registry.filter(function (oControl) {
+				return !!oControl.bindProperty && WHT_SUBSECTION.test(oControl.getId());
+			}).forEach(function (oSubSection) {
+				if (!oSubSection._zarirWhtBound) {
+					oSubSection._zarirWhtBound = true;
+					oSubSection.bindProperty("visible", {
+						path: "ShowWithholdingTax",
+						formatter: function (bShow) { return bShow === true; }
+					});
+				}
+			});
+		} catch (e) {
+			// never break the page because of this
+		}
+	}
+
 	// Preview: disabled when the request on the screen is posted
 	function applyPreviewEnabled(oView) {
 		try {
@@ -64,6 +89,7 @@ sap.ui.define([
 		[0, 300, 1000, 2500].forEach(function (iDelay) {
 			setTimeout(function () {
 				applyExchangeRateVisibility();
+					applyWithholdingTaxVisibility();
 				applyPreviewEnabled(oView);
 			}, iDelay);
 		});
