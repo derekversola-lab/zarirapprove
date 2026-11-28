@@ -80,6 +80,16 @@ sap.ui.define([
 		}
 	}
 
+	// Posted, reversal requested or reversed: no preview (printed from the AR mass print)
+	function isPostedValues(sStatus, sStatusText) {
+		return ["P", "Q", "V"].indexOf(sStatus) >= 0 ||
+			["Posted", "Reversal Requested", "Reversed"].indexOf(sStatusText) >= 0;
+	}
+
+	function isPostedContext(oCtx) {
+		return !!oCtx && isPostedValues(oCtx.getProperty("Status"), oCtx.getProperty("StatusText"));
+	}
+
 	// Preview: disabled when the request on the screen is posted
 	function applyPreviewEnabled(oView) {
 		try {
@@ -87,26 +97,34 @@ sap.ui.define([
 			if (!oContext || !oContext.requestProperty) {
 				return;
 			}
-			// Load Status (not on the screen), then bind the button to the status, so
-			// it also switches off when the request becomes Posted while the page is
-			// open (background posting, then Refresh)
+			// Load Status (not on the screen), then tie the button to the status:
+			//  - a binding on Status / StatusText switches it off as soon as the
+			//    request becomes Posted while the page is open (posting, Refresh);
+			//  - Fiori elements also enables header buttons itself (setEnabled):
+			//    the button's setEnabled is wrapped so it can never switch the
+			//    button on for a posted request.
+			// Only the object page's own button (the list's Preview button, still
+			// alive in the background, has its own rule in the manifest).
 			oContext.requestProperty(["Status", "StatusText"]).then(function () {
 				Element.registry.filter(function (oControl) {
-					return !!oControl.setEnabled && /CustomAction::PreviewPrint$/.test(oControl.getId());
+					return !!oControl.setEnabled && /RequestObjectPage--fe::CustomAction::PreviewPrint$/.test(oControl.getId());
 				}).forEach(function (oButton) {
 					if (oButton._zarirPreviewBound) {
 						return;
 					}
+					oButton._zarirPreviewBound = true;
+					var fnSetEnabled = oButton.setEnabled;
+					oButton.setEnabled = function (bEnabled) {
+						var oCtx = this.getBindingContext();
+						return fnSetEnabled.call(this, !!bEnabled && !isPostedContext(oCtx));
+					};
 					if (oButton.isBound("enabled")) {
 						oButton.unbindProperty("enabled", true);
 					}
-					oButton._zarirPreviewBound = true;
 					oButton.bindProperty("enabled", {
 						parts: [{ path: "Status" }, { path: "StatusText" }],
 						formatter: function (sStatus, sStatusText) {
-							// Posted, reversal requested or reversed: no preview
-							return ["P", "Q", "V"].indexOf(sStatus) < 0 &&
-								["Posted", "Reversal Requested", "Reversed"].indexOf(sStatusText) < 0;
+							return !isPostedValues(sStatus, sStatusText);
 						}
 					});
 				});
